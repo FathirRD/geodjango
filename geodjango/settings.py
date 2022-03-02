@@ -37,6 +37,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.gis',               # GIS package
+
+    'channels',                         # Channels
+    'rest_framework',                   # DRF
+
+    # App
+    'world',
+    'kgis'
 ]
 
 MIDDLEWARE = [
@@ -76,9 +84,9 @@ WSGI_APPLICATION = 'geodjango.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': 'geodjango',
+        'NAME': 'geodjangodb',
         'USER': 'fath',
-        # 'PASSWORD': 'asdf76',
+        'PASSWORD': 'asdf76',
         # 'HOST': '127.0.0.1',
         # 'PORT': '5432',
     }
@@ -123,10 +131,26 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+# STORAGE
+# Media File (Uploaded Files: etc)
+MEDIA_ROOT = BASE_DIR / 'static-server' / 'media-root'
+MEDIA_URL  = '/media/'
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD  = 'django.db.models.BigAutoField'
+
+# Channels
+ASGI_APPLICATION = 'geodjango.asgi.application'
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+        },
+    },
+}
 
 # GDAL Configuration for GeoDjango
 import os
