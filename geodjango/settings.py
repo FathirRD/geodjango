@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
+import os
 
 from pathlib import Path
 
@@ -20,12 +21,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-aa-s*c0x*j52iit(l(8+t%=ge2ob&$%b_ru4q-nq-1+0(t)e2c'
+# 'django-insecure-aa-s*c0x*j52iit(l(8+t%=ge2ob&$%b_ru4q-nq-1+0(t)e2c'
+SECRET_KEY = (os.environ.get('SECRET_KEY'))
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = (os.environ.get('DEBUG_VALUE') == 'True')
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["localhost", "kimulwsapi.herokuapp.com"]
 
 
 # Application definition
@@ -153,9 +155,11 @@ CHANNEL_LAYERS = {
 }
 
 # GDAL Configuration for GeoDjango
-import os
-
 if os.name == 'nt':
     VENV_BASE = os.environ['VIRTUAL_ENV']
     os.environ['PATH'] = os.path.join(VENV_BASE, 'Lib\\site-packages\\osgeo') + ';' + os.environ['PATH']
     os.environ['PROJ_LIB'] = os.path.join(VENV_BASE, 'Lib\\site-packages\\osgeo\\data\\proj') + ';' + os.environ['PATH']
+
+if not DEBUG:
+    import django_heroku
+    django_heroku.settings(locals())
