@@ -25,6 +25,9 @@ class DataSavedAdm(admin.OSMGeoAdmin):
     list_display    = [
         'id',
         'perangkat',
+        'muka_air',
+        'timestamp',
+        'timestamp2'
     ]
 
 admin.site.register(Area, KGISAdm) 

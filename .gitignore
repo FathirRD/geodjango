@@ -5,6 +5,7 @@
 # Extra
 scripts/
 temp/
+static-server/
 
 ### Django ###
 *.log

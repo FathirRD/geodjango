@@ -17,6 +17,17 @@ class PerangkatMonitorConsumer(AsyncWebsocketConsumer):
     groups              = [perangkat.nperangkat for perangkat in daftar_perangkat]
 
     async def connect(self):
+        perangkat       = self.scope["url_route"]["kwargs"]["perangkat"]
+        self.monitor    = f'monitor_{perangkat}'
+
+        if(perangkat not in self.groups):
+            await self.close()
+
+        await self.channel_layer.group_add(
+            self.monitor,
+            self.channel_name
+        )
+
         await self.accept()
 
     '''
@@ -26,59 +37,59 @@ class PerangkatMonitorConsumer(AsyncWebsocketConsumer):
     '''
     async def receive(self, text_data):
         text_data_json  = json.loads(text_data)
-        message         = text_data_json['data']
-        perangkat       = text_data_json['perangkat']
+
+        message         = text_data_json['message']
+        data            = text_data_json['data']
         saved_data      = None
 
         try:
             timestamp = datetime.fromtimestamp(text_data_json['request_id'])
         except: 
-            timestamp = ""
+            timestamp = None
 
-        if(message['foto']):
-            data        = {
-                'perangkat': message['p_id'],
-                'suhu': message['suhu'],
-                'muka_air': message['muka_air'],
-                'kelembapan': message['kelembapan'],
-                'tegangan': message['tegangan'],
-                'foto': message['foto'],
+        if("foto" in data):
+            payload   = {
+                'perangkat': data['p_id'],
+                'suhu': data['suhu'],
+                'muka_air': data['muka_air'],
+                'kelembapan': data['kelembapan'],
+                'tegangan': data['tegangan'],
+                'foto': data['foto'],
                 'timestamp2': timestamp,
                 'latlong': {
-                    'latitude': message['latitude'],
-                    'longitude': message['longitude']
+                    'latitude': data['latitude'],
+                    'longitude': data['longitude']
                 }
             }
             
-            saved_data = await self.save_data(data=data)
-
-        message.pop('p_id')
-        message.pop('foto')
-
+            saved_data = await self.save_data(data=payload)
+            data.pop('foto')
+        
         await self.channel_layer.group_send(
-            perangkat, {
+            self.monitor, {
                 'type': 'log_msg',
                 'message': message,
-                'perangkat': perangkat,
-                'saved': saved_data if saved_data else None
+                'data': data,
+                'saved': saved_data
             }
         )
 
     # Receive message from room group
     async def log_msg(self, event):
         message     = event['message']
-        perangkat   = event['perangkat']
         saved       = event['saved']
+        data        = event['data']
 
         # Send message to WebSocket
         await self.send(text_data=json.dumps({
             'message': message,
-            'perangkat': perangkat
+            'data': data,
         }))
 
         if(saved):
             await self.send(text_data=json.dumps({
-                'message': saved,
+                'message': "Saving data to database..",
+                'data': saved
             }))
 
     @database_sync_to_async
@@ -92,7 +103,6 @@ class PerangkatMonitorConsumer(AsyncWebsocketConsumer):
 class DataMonitorConsumer(
         generics.GenericAsyncAPIConsumer,
         mixins.ListModelMixin,
-        mixins.CreateModelMixin
     ):
 
     serializer_class    = DataSavedSerializer
