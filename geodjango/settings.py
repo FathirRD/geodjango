@@ -136,7 +136,7 @@ STATIC_URL = '/static/'
 if(not DEBUG):
     DEFAULT_FILE_STORAGE    = 'storages.backends.dropbox.DropBoxStorage'
     DROPBOX_OAUTH2_TOKEN    = "sl.BDURzRYsoe1APJm_cjRk7WLVC5hftm4g249FnCV2UNJkEIgcK5tAF6V_kwVrEapDNLgWF52zxS8VndFLAbuXorbYq-118YEBn7R4-SOrWvLC8jwWrz4PfH673QfQnwoLF2ZdhII"
-    DROPBOX_ROOT_PATH       = '/'
+    DROPBOX_ROOT_PATH       = '/media/'
 
 MEDIA_ROOT              = BASE_DIR / 'static-server' / 'media-root'
 MEDIA_URL               = '/media/'
