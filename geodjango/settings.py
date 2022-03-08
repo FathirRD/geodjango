@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-aa-s*c0x*j52iit(l(8+t%=ge2ob&$%b_ru4q-nq-1+0(t)e2c
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost']
 
 
 # Application definition
@@ -133,8 +133,13 @@ STATIC_URL = '/static/'
 
 # STORAGE
 # Media File (Uploaded Files: etc)
-MEDIA_ROOT = BASE_DIR / 'static-server' / 'media-root'
-MEDIA_URL  = '/media/'
+if(not DEBUG):
+    DEFAULT_FILE_STORAGE    = 'storages.backends.dropbox.DropBoxStorage'
+    DROPBOX_OAUTH2_TOKEN    = "sl.BDURzRYsoe1APJm_cjRk7WLVC5hftm4g249FnCV2UNJkEIgcK5tAF6V_kwVrEapDNLgWF52zxS8VndFLAbuXorbYq-118YEBn7R4-SOrWvLC8jwWrz4PfH673QfQnwoLF2ZdhII"
+    DROPBOX_ROOT_PATH       = '/'
+
+MEDIA_ROOT              = BASE_DIR / 'static-server' / 'media-root'
+MEDIA_URL               = '/media/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
